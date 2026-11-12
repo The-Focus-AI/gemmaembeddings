@@ -1,0 +1,21 @@
+# Default Focus.AI CI — runs the same mise tasks a developer runs (handbook/release.md, handbook/development.md).
+# An authorized owner still needs to configure branch protection; this file does not.
+name: ci
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: jdx/mise-action@v2
+      - run: mise run install
+      - run: mise run lint
+      - run: mise run test

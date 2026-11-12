@@ -1,0 +1,172 @@
+[tools]
+node = "22"
+"npm:pnpm" = "10.34.9"
+fnox = { version = "1.45.0", workflow = "release.yml" }
+gh = "latest"
+ripgrep = "latest"
+fd = "latest"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+"npm:markdownlint-cli2" = "0.24.0"
+"npm:skills" = "1.7.4"
+op = "2.41.1"
+bun = "1.4.4"
+
+[env]
+_.file = ".fnox/env"
+
+[tasks.setup]
+description = "Check the bootstrap token injected into this cloud environment"
+run = '''
+set -eu
+if [ ! -f fnox.toml ]; then
+  echo "No fnox configuration yet; no bootstrap token is needed."
+  exit 0
+fi
+if [ -z "${OP_SERVICE_ACCOUNT_TOKEN:-}" ]; then
+  echo "Set OP_SERVICE_ACCOUNT_TOKEN in this project's cloud secret settings using your 1Password account." >&2
+  exit 1
+fi
+echo "Bootstrap token is available; run mise run secrets:check to verify access."
+'''
+
+[tasks.install]
+description = "Install project dependencies and restore agent skills"
+run = '''
+set -eu
+if [ -f package.json ]; then
+  if [ -f pnpm-lock.yaml ]; then
+    pnpm install --frozen-lockfile
+  else
+    pnpm install --no-frozen-lockfile
+  fi
+fi
+npx -y skills experimental_install
+'''
+
+[tasks.dev]
+description = "Start the Bun.serve() EmbeddingGemma 2 local web playground"
+run = '''
+set -eu
+pnpm run dev "$@"
+'''
+
+[tasks.lint]
+description = "Run TypeScript typecheck and Markdown lint"
+run = '''
+set -eu
+pnpm run lint "$@"
+'''
+
+[tasks.test]
+description = "Run offline unit and integration tests for libSQL vector, hybrid search, MRL, and HTTP API"
+run = '''
+set -eu
+pnpm run test "$@"
+'''
+
+[tasks.deploy]
+description = "Non-deploying local research and benchmark repository"
+run = '''
+set -eu
+echo "Non-deploying repository: gemmaembeddings is a local EmbeddingGemma 2 research and benchmark lab (Bun + libSQL + local Ollama)." >&2
+exit 1
+'''
+
+[tasks."model:pull"]
+description = "Pull embeddinggemma-2:latest via local Ollama"
+run = '''
+set -eu
+ollama pull "${EMBEDDING_MODEL:-embeddinggemma-2:latest}"
+'''
+
+[tasks.seed]
+description = "Seed local libSQL database with text, code, and image embeddings using Ollama"
+run = '''
+set -eu
+pnpm run seed -- "$@"
+'''
+
+[tasks."seed:docs"]
+description = "Download/generate and index multi-page arXiv PDF papers (76 pp) and PowerPoint .pptx decks (14 slides)"
+run = '''
+set -eu
+pnpm run seed:docs -- "$@"
+'''
+
+[tasks."bench:docs"]
+description = "Compare Vision-Only vs Extracted-Text vs Fused embeddings across big PDF papers and PowerPoint decks"
+run = '''
+set -eu
+pnpm run bench:docs -- "$@"
+'''
+
+[tasks.cases]
+description = "List all 18 individual EmbeddingGemma 2 test case IDs"
+run = '''
+set -eu
+pnpm run cases "$@"
+'''
+
+[tasks.case]
+description = "Run 1 single test case by ID across FTS5, Vector, Hybrid, Prefixes, and MRL"
+run = '''
+set -eu
+pnpm run case -- "$@"
+'''
+
+[tasks.compare]
+description = "Compare 2 strings head-to-head across task prefixes and 768/512/256/128d MRL"
+run = '''
+set -eu
+pnpm run compare -- "$@"
+'''
+
+[tasks."bench:hybrid"]
+description = "Run Experiment 1 only: SQLite FTS5 BM25 vs Vector vs Hybrid RRF (optional filter)"
+run = '''
+set -eu
+pnpm run bench:hybrid -- "$@"
+'''
+
+[tasks."bench:prefixes"]
+description = "Run Experiment 2 only: Raw vs Task-Steered Prefixes A/B (optional filter)"
+run = '''
+set -eu
+pnpm run bench:prefixes -- "$@"
+'''
+
+[tasks."bench:mrl"]
+description = "Run Experiment 3 only: Matryoshka 768d/512d/256d/128d truncation (optional filter)"
+run = '''
+set -eu
+pnpm run bench:mrl -- "$@"
+'''
+
+[tasks."bench:multimodal"]
+description = "Run Experiment 4 only: Cross-Modal Text -> PNG Image retrieval (optional filter)"
+run = '''
+set -eu
+pnpm run bench:multimodal -- "$@"
+'''
+
+[tasks.bench]
+description = "Run all 4 EmbeddingGemma 2 experiments together"
+run = '''
+set -eu
+pnpm run bench -- "$@"
+'''
+
+[tasks.search]
+description = "Query the local libSQL vector + FTS5 hybrid store from the CLI"
+run = '''
+set -eu
+pnpm run search -- "$@"
+'''
+
+[tasks."secrets:check"]
+description = "Verify declared secrets resolve"
+run = "fnox check"
+
+[tasks."secrets:list"]
+description = "List declared secrets"
+run = "fnox list"

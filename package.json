@@ -1,0 +1,36 @@
+{
+  "name": "@thefocus-ai/gemmaembeddings",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local EmbeddingGemma 2 benchmark and playground with Bun, TypeScript, and libSQL vector search",
+  "scripts": {
+    "dev": "bun --watch src/server.ts",
+    "start": "bun src/server.ts",
+    "seed": "bun src/cli.ts seed",
+    "seed:docs": "bun src/cli.ts seed:docs",
+    "cases": "bun src/cli.ts cases",
+    "case": "bun src/cli.ts case",
+    "compare": "bun src/cli.ts compare",
+    "bench": "bun src/cli.ts bench",
+    "bench:docs": "bun src/cli.ts bench:docs",
+    "bench:hybrid": "bun src/cli.ts bench:hybrid",
+    "bench:prefixes": "bun src/cli.ts bench:prefixes",
+    "bench:mrl": "bun src/cli.ts bench:mrl",
+    "bench:multimodal": "bun src/cli.ts bench:multimodal",
+    "search": "bun src/cli.ts search",
+    "lint": "tsc --noEmit && markdownlint-cli2 \"**/*.md\"",
+    "typecheck": "tsc --noEmit",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "@libsql/client": "^0.15.15",
+    "jszip": "3.10.2",
+    "mupdf": "1.28.6",
+    "pptxgenjs": "4.0.1"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.10",
+    "typescript": "^5.8.3"
+  }
+}
